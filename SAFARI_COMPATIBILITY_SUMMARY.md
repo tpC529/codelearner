@@ -61,8 +61,11 @@ All icons feature an "L" on a pink background (#FF006E).
 |---------|---------|--------|-------|
 | Chrome  | 88+     | ✅ Fully supported | Direct installation |
 | Edge    | 88+     | ✅ Fully supported | Direct installation |
+| Brave   | 1.0+    | ✅ Fully supported | Chromium-based, direct installation |
 | Firefox | 109+    | ✅ Fully supported | Requires `browser_specific_settings` |
 | Safari  | 14.1+   | ✅ Fully supported | Requires Xcode conversion wrapper |
+| DuckDuckGo Desktop | Latest | ✅ Fully supported | Chromium-based, direct installation |
+| DuckDuckGo Mobile | N/A | ❌ Not supported | Limited extension API support |
 
 ## Safari-Specific Requirements Met
 
@@ -88,6 +91,17 @@ All icons feature an "L" on a pink background (#FF006E).
 2. Enable Developer mode
 3. Load unpacked extension
 4. Test on various websites
+
+### Brave Testing
+1. Navigate to `brave://extensions/`
+2. Enable Developer mode
+3. Load unpacked extension
+4. Test on various websites
+
+### DuckDuckGo Desktop Testing
+1. Access extensions settings (similar to Chromium browsers)
+2. Load unpacked extension
+3. Test on various websites
 
 ### Firefox Testing
 1. Navigate to `about:debugging#/runtime/this-firefox`

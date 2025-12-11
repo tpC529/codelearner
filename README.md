@@ -1,10 +1,10 @@
 # CodeLearner
 
-Highlight code blocks and get an explanation from an LLM. This browser extension works across multiple browsers including Chrome, Firefox, Edge, and Safari.
+Highlight code blocks and get an explanation from an LLM. This browser extension works across multiple browsers including Chrome, Firefox, Edge, Safari, Brave, and DuckDuckGo.
 
 ## Features
 
-- **Cross-Browser Support**: Compatible with Chrome, Firefox, Edge, and Safari
+- **Cross-Browser Support**: Compatible with Chrome, Firefox, Edge, Safari, Brave, and DuckDuckGo
 - **Simple Selection**: Hold Shift + drag to select any code or UI element on a webpage
 - **AI-Powered Explanations**: Get instant explanations powered by local LLM
 - **Privacy-Focused**: Uses local backend with Ollama for privacy
@@ -12,10 +12,13 @@ Highlight code blocks and get an explanation from an LLM. This browser extension
 
 ## Installation
 
-### Chrome, Edge, or Other Chromium-Based Browsers
+### Chrome, Edge, Brave, or Other Chromium-Based Browsers
 
 1. Clone this repository
-2. Open your browser and navigate to `chrome://extensions/` (or `edge://extensions/`)
+2. Open your browser and navigate to the extensions page:
+   - Chrome: `chrome://extensions/`
+   - Edge: `edge://extensions/`
+   - Brave: `brave://extensions/`
 3. Enable "Developer mode" in the top right corner
 4. Click "Load unpacked" and select the extension directory
 5. The extension is now installed and ready to use!
@@ -51,6 +54,18 @@ For permanent installation in Firefox, you'll need to package and sign the exten
    - Reload the extension after making changes
 
 **Note**: Safari requires extensions to be wrapped in a macOS app. The safari-web-extension-converter tool creates this wrapper automatically.
+
+### DuckDuckGo Browser
+
+The DuckDuckGo browser for desktop and mobile supports web extensions:
+
+**Desktop (macOS/Windows):**
+1. DuckDuckGo browser uses the same extension installation as Chromium-based browsers
+2. Navigate to the extensions page or settings
+3. Follow the same steps as Chrome/Brave installation above
+
+**Mobile:**
+DuckDuckGo mobile browser has limited extension support. Currently, the extension requires desktop browser APIs (tabs, screenshot capture) that are not available on mobile browsers.
 
 ## Backend Setup
 
@@ -92,8 +107,11 @@ The extension requires a local backend server running Ollama:
 |---------|---------|----------------|
 | Chrome  | 88+     | ✅ Fully supported |
 | Edge    | 88+     | ✅ Fully supported |
+| Brave   | 1.0+    | ✅ Fully supported (Chromium-based) |
 | Firefox | 109+    | ✅ Fully supported |
 | Safari  | 14.1+   | ✅ Fully supported (requires conversion) |
+| DuckDuckGo Desktop | Latest | ✅ Fully supported (Chromium-based) |
+| DuckDuckGo Mobile | N/A | ❌ Not supported (limited extension API) |
 
 ## Development
 
