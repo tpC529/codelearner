@@ -2,6 +2,10 @@
 
 AI-powered code and UI explanations for any webpage! Hold Shift and drag to select code or UI elements, then get instant explanations powered by local AI.
 
+## 🚀 Quick Start
+
+**New here?** Check out the [Quick Start Guide](QUICKSTART.md) to get up and running in 5 minutes!
+
 ## Features
 
 - 🎯 **Select & Learn**: Hold Shift + drag over any code or UI element
@@ -92,6 +96,22 @@ This extension is built with Manifest V3 and works on:
 - No data is sent to external servers
 - Screenshots are only used temporarily for AI analysis
 - Open source - audit the code yourself!
+
+## Distribution
+
+Want to publish this extension to browser stores? Check out the [Distribution Guide](DISTRIBUTION.md) for:
+- Store submission requirements for Chrome, Firefox, Edge, and Opera
+- How to create store listing assets
+- Privacy policy requirements
+- Using the included `package.sh` script to create distribution packages
+
+## Contributing
+
+Contributions are welcome! Feel free to:
+- Report bugs or issues
+- Suggest new features
+- Submit pull requests
+- Improve documentation
 
 ## License
 
