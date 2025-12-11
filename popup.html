@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: 320px;
+            padding: 16px;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #FF006E 0%, #FF4081 100%);
+            color: white;
+        }
+        h1 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        p {
+            margin: 8px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+        .step {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .step:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            text-align: center;
+            opacity: 0.9;
+        }
+        a {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎓 LearnByHover</h1>
+    <p>AI-powered code explanations on any webpage!</p>
+    
+    <div class="instructions">
+        <div class="step">Hold <strong>Shift</strong></div>
+        <div class="step">Click and drag over code or UI elements</div>
+        <div class="step">Get instant AI explanations</div>
+    </div>
+    
+    <p style="font-size: 12px; opacity: 0.9;">
+        <strong>Note:</strong> Make sure the backend server is running on port 8000.
+    </p>
+    
+    <div class="footer">
+        v1.0 | Made with ❤️
+    </div>
+</body>
+</html>
