@@ -1,0 +1,55 @@
+{
+  "manifest_version": 2,
+  "name": "LearnByHover",
+  "version": "1.0.0",
+  "description": "Hold Shift + drag to ask about any code/UI element and get AI-powered explanations",
+  "author": "CodeLearner Team",
+  "homepage_url": "https://github.com/tpC529/codelearner",
+  
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "LearnByHover - AI Code Explanations"
+  },
+  
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "<all_urls>"
+  ],
+  
+  "background": {
+    "scripts": ["background.js"]
+  },
+  
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["content.js"],
+    "all_frames": true
+  }],
+  
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "learnbyhover@codelearner.extension",
+      "strict_min_version": "109.0"
+    }
+  }
+}

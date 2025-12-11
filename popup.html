@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>LearnByHover</title>
+    <style>
+        body {
+            width: 320px;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+        }
+        h2 {
+            color: #FF006E;
+            font-size: 18px;
+            margin: 0 0 12px 0;
+        }
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            margin: 0 0 16px 0;
+        }
+        .instructions {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #FF006E;
+            margin-bottom: 16px;
+        }
+        .instructions strong {
+            color: #FF006E;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #FF006E;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+        .button:hover {
+            background: #d90060;
+        }
+        .button.secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .button.secondary:hover {
+            background: #d0d0d0;
+        }
+        .status {
+            font-size: 12px;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 12px;
+            text-align: center;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .footer {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <h2>🎓 LearnByHover</h2>
+    
+    <div class="instructions">
+        <p><strong>How to use:</strong></p>
+        <p style="margin: 0;">Hold <strong>Shift</strong> and drag over any code or UI element to get an AI explanation.</p>
+    </div>
+    
+    <button id="openOptions" class="button">⚙️ Open Settings</button>
+    <button id="testPage" class="button secondary">🧪 Open Test Page</button>
+    
+    <div id="status" class="status info">
+        Backend: <span id="backendUrl">Loading...</span>
+    </div>
+    
+    <div class="footer">
+        v1.0.0 | <a href="https://github.com/tpC529/codelearner" target="_blank" style="color: #FF006E; text-decoration: none;">GitHub</a>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

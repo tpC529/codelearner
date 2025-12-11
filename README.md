@@ -40,12 +40,25 @@ Highlight code blocks and UI elements to get AI-powered explanations instantly!
 
 1. **Download or Clone this repository** (same as above)
 
-2. **Open Add-ons Debug Page**
+2. **Use Firefox-compatible manifest** (Firefox requires Manifest V2)
+   ```bash
+   # Backup the original manifest
+   cp manifest.json manifest.v3.json
+   # Use Firefox manifest
+   cp manifest.v2.json manifest.json
+   ```
+
+3. **Open Add-ons Debug Page**
    - Navigate to `about:debugging#/runtime/this-firefox`
 
-3. **Load Temporary Add-on**
+4. **Load Temporary Add-on**
    - Click "Load Temporary Add-on"
    - Select the `manifest.json` file from the `codelearner` directory
+
+5. **Restore Chromium manifest** (when done testing in Firefox)
+   ```bash
+   cp manifest.v3.json manifest.json
+   ```
 
 **Note**: In Firefox, temporary add-ons are removed when you close the browser. For permanent installation, you would need to package and sign the extension through Mozilla Add-ons.
 
