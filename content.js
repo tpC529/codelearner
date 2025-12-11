@@ -1,6 +1,22 @@
 let selecting = false;
 let startX, startY;
 let questionCount = 0;
+let backendUrl = "http://localhost:8000"; // Default, will be loaded from storage
+
+// Load backend URL from storage
+chrome.storage.sync.get({backendUrl: "http://localhost:8000"}, (items) => {
+  backendUrl = items.backendUrl;
+  console.log("[CodeLearner] Backend URL loaded:", backendUrl);
+});
+
+// Listen for storage changes
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (namespace === 'sync' && changes.backendUrl) {
+    backendUrl = changes.backendUrl.newValue;
+    console.log("[CodeLearner] Backend URL updated:", backendUrl);
+  }
+});
+
 const overlay = document.createElement("div");
 overlay.style.cssText = "position:absolute; border:3px solid #FF006E; background:rgba(255,0,110,0.15); pointer-events:none; z-index:9999999; display:none;";
 document.body.appendChild(overlay);
@@ -65,14 +81,16 @@ document.addEventListener("mouseup", async () => {
 
     console.log("[CodeLearner] Sending to backend...");
     console.log("[CodeLearner] Screenshot length:", screenshot.length);
+    console.log("[CodeLearner] Using backend URL:", backendUrl);
     
-    const res = await fetch("http://127.0.0.1:8000/api", {
+    const res = await fetch(`${backendUrl}/api`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({image_b64: screenshot, coords, question_count: questionCount})
     }).catch(err => {
       console.error("[CodeLearner] Fetch error details:", err);
-      throw err;
+      console.error("[CodeLearner] Make sure backend is running at:", backendUrl);
+      throw new Error(`Cannot connect to backend at ${backendUrl}. Please check that the backend server is running and the URL is correct in extension settings.`);
     });
 
     console.log("[CodeLearner] Response status:", res.status);
