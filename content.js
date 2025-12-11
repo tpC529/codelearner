@@ -3,7 +3,15 @@ let startX, startY;
 let questionCount = 0;
 const overlay = document.createElement("div");
 overlay.style.cssText = "position:absolute; border:3px solid #FF006E; background:rgba(255,0,110,0.15); pointer-events:none; z-index:9999999; display:none;";
-document.body.appendChild(overlay);
+
+// Ensure body exists before appending
+if (document.body) {
+  document.body.appendChild(overlay);
+} else {
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.appendChild(overlay);
+  });
+}
 
 document.addEventListener("mousedown", e => {
   if (e.shiftKey) {
