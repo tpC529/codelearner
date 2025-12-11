@@ -30,4 +30,7 @@ build/
 # Temporary files
 *.tmp
 *.log
+
+# Development scripts
 create_icons.py
+validate_extension.py
