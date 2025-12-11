@@ -105,6 +105,7 @@ function showFloatingPanel(imgSrc, text) {
     panel.style.cssText = "position:fixed; bottom:20px; right:20px; width:380px; max-height:80vh; background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); z-index:1000000; padding:16px; overflow:auto; font-family:sans-serif;";
     document.body.appendChild(panel);
   }
+  
   // Sanitize text to prevent XSS by escaping HTML entities
   const sanitizedText = text.replace(/&/g, '&amp;')
                             .replace(/</g, '&lt;')
@@ -113,14 +114,38 @@ function showFloatingPanel(imgSrc, text) {
                             .replace(/'/g, '&#039;')
                             .replace(/\n/g, "<br>");
   
-  panel.innerHTML = `
-    <img src="${imgSrc}" style="max-width:100%; border-radius:8px; margin-bottom:12px;">
-    <p><strong>Explanation:</strong> ${sanitizedText}</p>
-    <button id="close-learn-panel" style="padding:8px 16px; background:#FF006E; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">Close & Reset</button>
-  `;
+  // Validate imgSrc is a safe data URI (base64 encoded PNG)
+  if (!imgSrc || !imgSrc.startsWith('data:image/png;base64,')) {
+    console.error("[CodeLearner] Invalid image source");
+    return;
+  }
   
-  document.getElementById("close-learn-panel").addEventListener("click", () => {
+  // Create elements safely without innerHTML for better security
+  panel.innerHTML = '';
+  
+  const img = document.createElement('img');
+  img.src = imgSrc;
+  img.style.cssText = 'max-width:100%; border-radius:8px; margin-bottom:12px;';
+  
+  const p = document.createElement('p');
+  const strong = document.createElement('strong');
+  strong.textContent = 'Explanation: ';
+  p.appendChild(strong);
+  
+  const explanationSpan = document.createElement('span');
+  explanationSpan.innerHTML = sanitizedText;
+  p.appendChild(explanationSpan);
+  
+  const button = document.createElement('button');
+  button.id = 'close-learn-panel';
+  button.textContent = 'Close & Reset';
+  button.style.cssText = 'padding:8px 16px; background:#FF006E; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;';
+  button.addEventListener('click', () => {
     panel.remove();
     questionCount = 0;
   });
+  
+  panel.appendChild(img);
+  panel.appendChild(p);
+  panel.appendChild(button);
 }
