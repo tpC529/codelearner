@@ -29,7 +29,7 @@ zip -r "$PACKAGE_NAME" \
     -x "*__pycache__*" \
     -x "*.pyc" \
     -x "*.DS_Store" \
-    -x "*test*" \
+    -x "test.html" \
     -x "backend.py" \
     -x "serve_test.py"
 

@@ -4,14 +4,16 @@ let questionCount = 0;
 const overlay = document.createElement("div");
 overlay.style.cssText = "position:absolute; border:3px solid #FF006E; background:rgba(255,0,110,0.15); pointer-events:none; z-index:9999999; display:none;";
 
-// Ensure body exists before appending
-if (document.body) {
-  document.body.appendChild(overlay);
-} else {
-  document.addEventListener("DOMContentLoaded", () => {
+// Ensure body exists before appending - handle all document states
+function appendOverlay() {
+  if (document.body) {
     document.body.appendChild(overlay);
-  });
+  } else {
+    // Fallback: wait a bit and try again
+    setTimeout(appendOverlay, 100);
+  }
 }
+appendOverlay();
 
 document.addEventListener("mousedown", e => {
   if (e.shiftKey) {
