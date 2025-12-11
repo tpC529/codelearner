@@ -8,6 +8,11 @@ Highlight code blocks and UI elements to get AI-powered explanations instantly!
 - 🤖 **AI Explanations**: Get instant explanations powered by AI vision models
 - 🌐 **Cross-Browser Support**: Works on Chrome, Edge, Brave, Firefox, and other modern browsers
 - ⚙️ **Configurable**: Set your own backend server URL in extension settings
+- 🔒 **Privacy-First**: No data collection, all processing on your configured backend
+
+## Version
+
+Current version: 1.0.0 - Production-ready release with full cross-browser support
 
 ## Installation
 

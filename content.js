@@ -90,7 +90,7 @@ document.addEventListener("mouseup", async () => {
     }).catch(err => {
       console.error("[CodeLearner] Fetch error details:", err);
       console.error("[CodeLearner] Make sure backend is running at:", backendUrl);
-      throw new Error(`Cannot connect to backend at ${backendUrl}. Please check that the backend server is running and the URL is correct in extension settings.`);
+      throw new Error(`Cannot connect to backend at ${backendUrl}. Please check that the backend server is running and the URL is correct. To change the URL, right-click the extension icon and select 'Options'.`);
     });
 
     console.log("[CodeLearner] Response status:", res.status);

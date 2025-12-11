@@ -12,10 +12,15 @@ document.getElementById('openOptions').addEventListener('click', () => {
   chrome.runtime.openOptionsPage();
 });
 
-// Open test page
+// Open test page (only works if test server is running)
 document.getElementById('testPage').addEventListener('click', () => {
-  chrome.tabs.create({
-    url: 'http://localhost:8080/test.html'
+  // Load test page URL from storage, fallback to default
+  chrome.storage.sync.get({
+    testPageUrl: 'http://localhost:8080/test.html'
+  }, (items) => {
+    chrome.tabs.create({
+      url: items.testPageUrl
+    });
   });
 });
 
