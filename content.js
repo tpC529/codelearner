@@ -1,3 +1,6 @@
+// Use browser API for cross-browser compatibility (Chrome, Firefox, Safari)
+const browserAPI = (typeof browser !== 'undefined') ? browser : chrome;
+
 let selecting = false;
 let startX, startY;
 let questionCount = 0;
@@ -47,7 +50,7 @@ document.addEventListener("mouseup", async () => {
 
   // Request screenshot from background script
   try {
-    const response = await chrome.runtime.sendMessage({action: "capture"});
+    const response = await browserAPI.runtime.sendMessage({action: "capture"});
     console.log("[CodeLearner] Response:", response);
     
     if (!response || typeof response === 'object' && response.error) {
@@ -102,9 +105,17 @@ function showFloatingPanel(imgSrc, text) {
     panel.style.cssText = "position:fixed; bottom:20px; right:20px; width:380px; max-height:80vh; background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); z-index:1000000; padding:16px; overflow:auto; font-family:sans-serif;";
     document.body.appendChild(panel);
   }
+  // Sanitize text to prevent XSS by escaping HTML entities
+  const sanitizedText = text.replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/"/g, '&quot;')
+                            .replace(/'/g, '&#039;')
+                            .replace(/\n/g, "<br>");
+  
   panel.innerHTML = `
     <img src="${imgSrc}" style="max-width:100%; border-radius:8px; margin-bottom:12px;">
-    <p><strong>Explanation:</strong> ${text.replace(/\n/g, "<br>")}</p>
+    <p><strong>Explanation:</strong> ${sanitizedText}</p>
     <button id="close-learn-panel" style="padding:8px 16px; background:#FF006E; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">Close & Reset</button>
   `;
   
