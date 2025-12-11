@@ -106,14 +106,6 @@ function showFloatingPanel(imgSrc, text) {
     document.body.appendChild(panel);
   }
   
-  // Sanitize text to prevent XSS by escaping HTML entities
-  const sanitizedText = text.replace(/&/g, '&amp;')
-                            .replace(/</g, '&lt;')
-                            .replace(/>/g, '&gt;')
-                            .replace(/"/g, '&quot;')
-                            .replace(/'/g, '&#039;')
-                            .replace(/\n/g, "<br>");
-  
   // Validate imgSrc is a safe data URI (base64 encoded PNG)
   if (!imgSrc || !imgSrc.startsWith('data:image/png;base64,')) {
     console.error("[CodeLearner] Invalid image source");
@@ -132,9 +124,15 @@ function showFloatingPanel(imgSrc, text) {
   strong.textContent = 'Explanation: ';
   p.appendChild(strong);
   
-  const explanationSpan = document.createElement('span');
-  explanationSpan.innerHTML = sanitizedText;
-  p.appendChild(explanationSpan);
+  // Split text by newlines and add them as separate text nodes with br elements
+  const lines = text.split('\n');
+  lines.forEach((line, index) => {
+    const textNode = document.createTextNode(line);
+    p.appendChild(textNode);
+    if (index < lines.length - 1) {
+      p.appendChild(document.createElement('br'));
+    }
+  });
   
   const button = document.createElement('button');
   button.id = 'close-learn-panel';
