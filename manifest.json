@@ -3,15 +3,9 @@
   "name": "LearnByHover",
   "version": "1.0.0",
   "description": "Hold Shift + drag to ask about any code/UI",
-  "permissions": ["activeTab", "tabs"],
-  "host_permissions": ["<all_urls>", "http://127.0.0.1:8000/*", "http://localhost:8000/*"],
+  "permissions": ["activeTab", "tabs", "storage"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "learnbyhover@example.com"
-    }
   },
   "background": {
     "service_worker": "background.js"
@@ -22,6 +16,7 @@
     "all_frames": true,
     "run_at": "document_end"
   }],
+  "options_page": "options.html",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",

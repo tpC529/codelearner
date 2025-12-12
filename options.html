@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LearnByHover Settings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 500px;
+    }
+    h1 {
+      color: #333;
+      font-size: 24px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #555;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .status {
+      margin-top: 10px;
+      color: green;
+      font-weight: bold;
+    }
+    .info {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>LearnByHover Settings</h1>
+  
+  <div class="info" style="margin-top: 0; background: #e8f5e9; border-left: 4px solid #4CAF50;">
+    <strong>✓ No Configuration Required!</strong><br>
+    The extension works out-of-the-box with the default backend URL <code>http://127.0.0.1:8000</code>.<br>
+    Only change this if you're using a custom backend server.
+  </div>
+  
+  <label for="backendUrl">Backend URL (Optional):</label>
+  <input type="text" id="backendUrl" placeholder="http://127.0.0.1:8000">
+  <button id="save">Save Settings</button>
+  <div class="status" id="status"></div>
+  
+  <div class="info">
+    <strong>Note:</strong> Make sure your backend server is running at the specified URL.
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>
