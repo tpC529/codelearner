@@ -136,4 +136,4 @@ The extension uses Manifest V3 format for maximum compatibility and security. It
 
 ## License
 
-This project is provided as-is for educational and personal use.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
