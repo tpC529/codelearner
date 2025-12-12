@@ -4,7 +4,7 @@ Test CORS configuration for backend.py
 import re
 import pytest
 from fastapi.testclient import TestClient
-from backend import app, allowed_origins, allowed_origin_regex
+from backend import app, allowed_origins, allowed_origin_pattern
 
 client = TestClient(app)
 
@@ -18,21 +18,21 @@ def test_cors_allowed_origins_list():
 def test_cors_regex_pattern():
     """Test that the allowed origin regex matches expected extension protocols"""
     # Chrome/Edge/Brave/DuckDuckGo extensions
-    assert re.match(allowed_origin_regex, "chrome-extension://abcdefghijklmnop")
+    assert allowed_origin_pattern.match("chrome-extension://abcdefghijklmnop")
     
     # Firefox extensions
-    assert re.match(allowed_origin_regex, "moz-extension://12345678-1234-1234-1234-123456789012")
+    assert allowed_origin_pattern.match("moz-extension://12345678-1234-1234-1234-123456789012")
     
     # Safari extensions
-    assert re.match(allowed_origin_regex, "safari-web-extension://12345678-ABCD-EFGH-IJKL-123456789012")
+    assert allowed_origin_pattern.match("safari-web-extension://12345678-ABCD-EFGH-IJKL-123456789012")
     
     # Localhost with port
-    assert re.match(allowed_origin_regex, "http://localhost:8080")
-    assert re.match(allowed_origin_regex, "http://127.0.0.1:3000")
+    assert allowed_origin_pattern.match("http://localhost:8080")
+    assert allowed_origin_pattern.match("http://127.0.0.1:3000")
     
     # Should not match malicious origins
-    assert not re.match(allowed_origin_regex, "https://malicious-site.com")
-    assert not re.match(allowed_origin_regex, "http://evil.com")
+    assert not allowed_origin_pattern.match("https://malicious-site.com")
+    assert not allowed_origin_pattern.match("http://evil.com")
 
 
 def test_cors_headers_localhost():

@@ -6,6 +6,7 @@ import base64
 from io import BytesIO
 from PIL import Image, ImageDraw
 import ollama
+import re
 
 app = FastAPI()
 
@@ -18,6 +19,7 @@ allowed_origins = [
 
 # Use regex to support extension IDs (which vary per installation)
 allowed_origin_regex = r"(chrome-extension://.*|moz-extension://.*|safari-web-extension://.*|http://localhost:.*|http://127\.0\.0\.1:.*)"
+allowed_origin_pattern = re.compile(allowed_origin_regex)
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,9 +38,8 @@ async def add_cors_headers(request, call_next):
     
     # Check if origin matches allowed patterns
     if origin:
-        import re
         # Check if origin is in allowed list or matches regex pattern
-        if origin in allowed_origins or re.match(allowed_origin_regex, origin):
+        if origin in allowed_origins or allowed_origin_pattern.match(origin):
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Methods"] = "*"
             response.headers["Access-Control-Allow-Headers"] = "*"
