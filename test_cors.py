@@ -1,7 +1,6 @@
 """
 Test CORS configuration for backend.py
 """
-import re
 import pytest
 from fastapi.testclient import TestClient
 from backend import app, allowed_origins, allowed_origin_pattern
@@ -33,6 +32,8 @@ def test_cors_regex_pattern():
     # Should not match malicious origins
     assert not allowed_origin_pattern.match("https://malicious-site.com")
     assert not allowed_origin_pattern.match("http://evil.com")
+    assert not allowed_origin_pattern.match("https://localhost.evil.com")
+    assert not allowed_origin_pattern.match("https://chrome-extension.evil.com")
 
 
 def test_cors_headers_localhost():
