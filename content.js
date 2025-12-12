@@ -69,9 +69,15 @@ document.addEventListener("mouseup", async () => {
     console.log("[CodeLearner] Sending to backend...");
     console.log("[CodeLearner] Screenshot length:", screenshot.length);
     
-    // Get backend URL from storage
-    const { backendUrl } = await browserAPI.storage.sync.get(['backendUrl']);
-    const apiUrl = backendUrl || 'http://127.0.0.1:8000';
+    // Get backend URL from storage with error handling
+    let apiUrl = 'http://127.0.0.1:8000';
+    try {
+      const { backendUrl } = await browserAPI.storage.sync.get(['backendUrl']);
+      apiUrl = backendUrl || 'http://127.0.0.1:8000';
+    } catch (storageErr) {
+      console.error("[CodeLearner] Storage access error:", storageErr);
+      // Continue with default URL if storage fails
+    }
 
     console.log("[CodeLearner] Using backend URL:", apiUrl);
 

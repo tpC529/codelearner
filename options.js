@@ -21,6 +21,17 @@ document.getElementById('save').addEventListener('click', () => {
     return;
   }
   
+  // Validate URL format
+  try {
+    new URL(backendUrl);
+  } catch (e) {
+    const status = document.getElementById('status');
+    status.textContent = 'Invalid URL format';
+    status.style.color = 'red';
+    setTimeout(() => status.textContent = '', 2000);
+    return;
+  }
+  
   // Remove trailing slash if present
   const cleanUrl = backendUrl.replace(/\/$/, '');
   
