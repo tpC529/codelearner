@@ -62,24 +62,30 @@ async def explain(data: RequestData):
 
         print("[Backend] Image cropped, sending to ollama...")
         
-        # 4. Send cropped image to AI (better focus)
+        # 4. Send cropped image to AI — maximum coherence mode
         cropped_b64 = img_to_b64(cropped).split(",")[1]
+
         response = ollama.generate(
             model="moondream:1.8b",
-            prompt="Analyze this cropped image of code. First, identify the programming language. Then, explain step-by-step what the code does, including its main purpose or function. If unclear, note assumptions. Output in this format: Language: [language] || Explanation: [brief step-by-step description] || Purpose: [high-level goal]",
+            prompt="Describe what code or text you see in this image. What programming language is it? What does it do?",
             images=[cropped_b64],
             options={
-                "num_predict": 200,
-                "temperature": 0.7,
-                "num_ctx": 2048
-            }
+                "temperature": 0.3,
+                "num_predict": 100,
+                "num_ctx": 2048,
+            },
+            keep_alive="10m"
         )
-        
+
         print("[Backend] Ollama response received")
 
+        raw = response["response"].strip()
+        print(f"[Backend] Raw response: '{raw}'")
+        print(f"[Backend] Response length: {len(raw)}")
+
         return {
-            "highlighted": img_to_b64(cropped),  # Show only the cropped selection
-            "explanation": response["response"],
+            "highlighted": img_to_b64(cropped),
+            "explanation": raw if raw else "No explanation generated",  # Fallback
             "next_question_allowed": data.question_count < 3
         }
     except Exception as e:
