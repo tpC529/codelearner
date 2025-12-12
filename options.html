@@ -56,14 +56,20 @@
 </head>
 <body>
   <h1>LearnByHover Settings</h1>
-  <label for="backendUrl">Backend URL:</label>
+  
+  <div class="info" style="margin-top: 0; background: #e8f5e9; border-left: 4px solid #4CAF50;">
+    <strong>✓ No Configuration Required!</strong><br>
+    The extension works out-of-the-box with the default backend URL <code>http://127.0.0.1:8000</code>.<br>
+    Only change this if you're using a custom backend server.
+  </div>
+  
+  <label for="backendUrl">Backend URL (Optional):</label>
   <input type="text" id="backendUrl" placeholder="http://127.0.0.1:8000">
   <button id="save">Save Settings</button>
   <div class="status" id="status"></div>
   
   <div class="info">
-    <strong>Note:</strong> Make sure your backend server is running at the specified URL. 
-    The default is <code>http://127.0.0.1:8000</code> for local development.
+    <strong>Note:</strong> Make sure your backend server is running at the specified URL.
   </div>
   
   <script src="options.js"></script>
