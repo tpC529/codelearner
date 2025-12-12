@@ -101,6 +101,10 @@ The extension requires a local backend server running Ollama:
 - **Local Processing**: Uses local backend for privacy (no data sent to external servers)
 - **Minimal Permissions**: Only requests necessary browser permissions
 
+## Privacy
+
+This extension respects your privacy. All code analysis is performed locally on your machine. See our [Privacy Policy](PRIVACY.md) for details.
+
 ## Browser Compatibility
 
 | Browser | Version | Support Status |
@@ -134,6 +138,8 @@ The extension uses Manifest V3 format for maximum compatibility and security. It
 - Check that the extension is enabled in Safari Preferences
 - Grant all requested permissions when prompted
 
-## License
+## License & Privacy
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+For information about data collection and privacy, see our [Privacy Policy](PRIVACY.md).

@@ -3,6 +3,7 @@
   "name": "LearnByHover",
   "version": "1.0.0",
   "description": "Hold Shift + drag to ask about any code/UI",
+  "homepage_url": "https://github.com/tpC529/codelearner",
   "permissions": ["activeTab", "tabs", "storage"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
