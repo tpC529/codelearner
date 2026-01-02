@@ -110,7 +110,7 @@ The extension stores data locally in your browser:
 - **Backend URL**: If using legacy mode (stored using Chrome/Firefox storage API)
 
 ### Data Lifecycle
-- Model cache persists until you clear browser data
+- Model cache (~350MB) persists until you clear browser data
 - Settings persist until you uninstall the extension or clear sync data
 - No data is stored on external servers
 - All data can be cleared through browser settings

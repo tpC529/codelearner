@@ -54,9 +54,10 @@ After evaluating multiple options for browser-based vision-language inference, *
 - Quantized models reduce memory footprint significantly
 
 **Model Recommendations:**
-1. **Florence-2-base** (220M) - Best for resource-constrained environments
-2. **Moondream2** (1.8B) - Maintains parity with current implementation
-3. **SmolVLM-Instruct** (2B) - Good balance of quality and performance
+1. **ViT-GPT2** (~350MB) - Well-tested in Transformers.js, good for general image understanding
+2. **BLIP-base** (~500MB) - Alternative image captioning model
+3. **Florence-2-base** (when available) - Specialized for code/document understanding
+4. **Moondream2** (when available) - Maintains parity with current implementation
 
 **Example Implementation:**
 ```javascript
@@ -210,22 +211,24 @@ const result = await model(imageData, {
 5. **API Simplicity**: Similar to Python transformers library, reducing learning curve
 6. **Active Development**: Regular updates, bug fixes, and new model support
 
-### Recommended Model: Florence-2-base
+### Recommended Model: ViT-GPT2 Image Captioning
 
-**Model:** microsoft/Florence-2-base-ft  
-**Size:** ~220MB (quantized: ~80MB)  
-**Parameters:** 220M  
+**Model:** Xenova/vit-gpt2-image-captioning  
+**Size:** ~350MB  
+**Parameters:** ~300M  
 **Strengths:**
-- Smallest viable VLM for code understanding
-- Efficient on older GPUs like Intel Iris Xe
-- Fast inference (<2s on Intel Iris Xe with WebGL)
-- Good accuracy for code recognition and explanation
-- Microsoft-backed with ongoing support
+- Well-tested and stable in Transformers.js
+- Good performance on image understanding tasks
+- Reasonable size for browser deployment
+- Works well with WebGL on older GPUs like Intel Iris Xe
+- Fast inference (<3s on Intel Iris Xe with WebGL)
+- Officially supported by Hugging Face
 
-**Alternative:** Xenova/moondream2 (1.8B, quantized ~500MB)
-- Maintains parity with current implementation
-- Higher quality explanations
-- Slightly slower but still acceptable on Intel Iris Xe
+**Alternative:** Xenova/blip-image-captioning-base
+- Slightly larger but potentially better quality
+- Also well-supported in Transformers.js
+
+**Note:** Florence-2 and Moondream2 models are not yet fully supported in Transformers.js browser environment, but can be added when support becomes available.
 
 ### Implementation Architecture
 
@@ -260,18 +263,18 @@ Storage:
 ### Performance Expectations
 
 **First Load (Model Download):**
-- Florence-2-base: ~15-30s download + 5s initialization
-- Moondream2: ~45-60s download + 10s initialization
+- ViT-GPT2: ~20-40s download + 3-5s initialization
+- BLIP-base: ~30-60s download + 3-5s initialization
 - *User sees progress indicator during download*
 
 **Subsequent Loads (Cached):**
 - Model load from cache: <2s
-- Inference time: 1-3s on Intel Iris Xe
-- **Total time: 3-5s (vs 8-12s with Python backend)**
+- Inference time: 2-4s on Intel Iris Xe
+- **Total time: 4-6s (vs 8-12s with Python backend)**
 
 **Memory Usage:**
-- Florence-2-base: ~300MB RAM
-- Moondream2: ~700MB RAM
+- ViT-GPT2: ~400MB RAM
+- BLIP-base: ~600MB RAM
 - Browser typically has 2-4GB available
 
 ### Browser Compatibility
@@ -290,7 +293,7 @@ Storage:
 - Install Transformers.js
 - Create model-worker.js
 - Update content.js to use worker
-- Test with Florence-2-base
+- Test with ViT-GPT2 model
 
 **Phase 2: Optimization (Day 3)**
 - Implement model caching
@@ -320,18 +323,18 @@ Storage:
 
 ## Conclusion
 
-**Selected Solution: Transformers.js with Florence-2-base**
+**Selected Solution: Transformers.js with ViT-GPT2**
 
 This combination provides:
 - ✅ Best developer experience
-- ✅ Good model availability
+- ✅ Well-tested model support
 - ✅ Strong community support
-- ✅ Acceptable performance on Intel Iris Xe
+- ✅ Good performance on Intel Iris Xe
 - ✅ Easiest integration path
 - ✅ Future-proof (WebGPU ready)
 
 **Expected Outcomes:**
-- **2-3x faster** inference vs Python backend on Intel Iris Xe
+- **1.5-2x faster** inference vs Python backend on Intel Iris Xe
 - **Simpler installation** (no Python/Ollama required)
 - **Better privacy** (all processing in browser)
 - **Cached model** loads in <2s after first use

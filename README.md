@@ -155,7 +155,7 @@ This extension prioritizes your privacy. All code analysis is performed entirely
 
 The extension uses [Transformers.js](https://huggingface.co/docs/transformers.js) to run vision-language models directly in your browser:
 
-1. **Model**: Florence-2-base or Moondream2 (quantized for efficiency)
+1. **Model**: ViT-GPT2 image captioning (quantized for efficiency)
 2. **Inference**: WebGPU/WebGL acceleration for fast processing
 3. **Caching**: Models cached in IndexedDB after first download
 4. **Privacy**: All processing happens locally in your browser
