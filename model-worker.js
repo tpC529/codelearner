@@ -14,22 +14,20 @@ let modelLoaded = false;
 
 // Model configuration
 const MODEL_CONFIG = {
-  // Primary model - smaller and faster
+  // Primary model - ViT-GPT2 for image captioning (well-supported in Transformers.js)
   primary: {
-    name: 'Xenova/florence-2-base-ft',
+    name: 'Xenova/vit-gpt2-image-captioning',
     task: 'image-to-text',
     options: {
       device: 'auto', // WebGPU > WebGL > WASM
-      dtype: 'q8', // Quantized int8 for smaller size
     }
   },
-  // Fallback model if primary fails
+  // Fallback model - smaller BLIP model
   fallback: {
-    name: 'Xenova/moondream2',
+    name: 'Xenova/blip-image-captioning-base',
     task: 'image-to-text',
     options: {
       device: 'auto',
-      dtype: 'q8',
     }
   }
 };

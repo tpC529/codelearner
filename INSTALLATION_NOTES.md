@@ -20,7 +20,7 @@ Version 2.0 introduces browser-based AI inference using Transformers.js. This me
 ## First Use
 
 On your first use of the extension, it will:
-1. Download an AI model from Hugging Face CDN (~80-500MB)
+1. Download an AI model from Hugging Face CDN (~350MB)
 2. Cache the model in your browser's IndexedDB
 3. Initialize the model for inference
 
@@ -48,7 +48,7 @@ On your first use of the extension, it will:
 ## Storage
 
 The extension uses browser storage for:
-- **IndexedDB**: Cached AI models (80-500MB)
+- **IndexedDB**: Cached AI models (~350MB)
 - **Chrome Sync Storage**: User settings (<1KB)
 
 To clear cached models:
