@@ -1,13 +1,17 @@
 {
   "manifest_version": 3,
   "name": "LearnByHover",
-  "version": "1.0.0",
-  "description": "Hold Shift + drag to ask about any code/UI",
+  "version": "2.0.0",
+  "description": "Hold Shift + drag to ask about any code/UI - now with browser-based AI!",
   "homepage_url": "https://github.com/tpC529/codelearner",
   "permissions": ["activeTab", "tabs", "storage"],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
+  "web_accessible_resources": [{
+    "resources": ["model-worker.js"],
+    "matches": ["<all_urls>"]
+  }],
   "background": {
     "service_worker": "background.js"
   },

@@ -27,6 +27,14 @@
       border-radius: 4px;
       box-sizing: border-box;
     }
+    select {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
     button {
       padding: 10px 20px;
       background: #4CAF50;
@@ -52,25 +60,55 @@
       font-size: 14px;
       color: #666;
     }
+    .backend-settings {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
   <h1>LearnByHover Settings</h1>
   
-  <div class="info" style="margin-top: 0; background: #e8f5e9; border-left: 4px solid #4CAF50;">
-    <strong>✓ No Configuration Required!</strong><br>
-    The extension works out-of-the-box with the default backend URL <code>http://127.0.0.1:8000</code>.<br>
-    Only change this if you're using a custom backend server.
+  <div class="info" style="margin-top: 0; background: #e3f2fd; border-left: 4px solid #2196F3;">
+    <strong>✨ New: Browser-Based AI!</strong><br>
+    The extension now uses AI models running directly in your browser.<br>
+    No Python backend required! Just install and use.
   </div>
   
-  <label for="backendUrl">Backend URL (Optional):</label>
-  <input type="text" id="backendUrl" placeholder="http://127.0.0.1:8000">
-  <button id="save">Save Settings</button>
-  <div class="status" id="status"></div>
+  <label for="inferenceMode">Inference Mode:</label>
+  <select id="inferenceMode">
+    <option value="browser">Browser-Based (Recommended - No setup required)</option>
+    <option value="backend">Backend Mode (Legacy - Requires Python + Ollama)</option>
+  </select>
   
   <div class="info">
-    <strong>Note:</strong> Make sure your backend server is running at the specified URL.
+    <strong>Browser-Based Mode:</strong><br>
+    • No installation required<br>
+    • Faster on modern GPUs<br>
+    • Complete privacy (all processing in browser)<br>
+    • Works offline after first model download<br>
+    <br>
+    <strong>Backend Mode:</strong><br>
+    • Requires Python backend running on localhost<br>
+    • Uses Ollama with moondream:1.8b model<br>
+    • Only use if you prefer the old setup
   </div>
+  
+  <div id="backendSettings" class="backend-settings">
+    <label for="backendUrl">Backend URL:</label>
+    <input type="text" id="backendUrl" placeholder="http://127.0.0.1:8000">
+    
+    <div class="info" style="margin-top: 10px;">
+      <strong>Note:</strong> Make sure your backend server is running at the specified URL.
+    </div>
+  </div>
+  
+  <button id="save">Save Settings</button>
+  <div class="status" id="status"></div>
   
   <script src="options.js"></script>
 </body>
