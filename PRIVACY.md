@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last Updated: December 12, 2025**
+**Last Updated: January 2, 2026**
 
 ## Overview
 
@@ -20,26 +20,35 @@ CodeLearner is designed with privacy as a core principle. The extension:
 
 ## How the Extension Works
 
-### Local Processing Only
+### Browser-Based Processing (Default Mode)
 
-All code analysis and explanations are performed **entirely on your local machine** using Ollama, an open-source AI tool that runs locally. When you use CodeLearner:
+All code analysis and explanations are performed **entirely in your browser** using AI models that run locally. When you use CodeLearner:
 
 1. You select a code snippet or UI element on a webpage
 2. A screenshot of that selection is captured
-3. The screenshot is sent **only** to your local backend server (running at `127.0.0.1:8000` on your own computer)
-4. The local Ollama AI model processes the image and generates an explanation
+3. The screenshot is processed **entirely in your browser** using Transformers.js
+4. The local AI model analyzes the image and generates an explanation
 5. The explanation is displayed in your browser
 
-**At no point does any data leave your device or get sent to external servers.**
+**At no point does any data leave your browser or device.**
 
-### Screenshot Handling
+### Model Download
 
-When you select code or UI elements:
+On first use, the extension downloads an AI model from Hugging Face's CDN:
+- This is a one-time download (80-500MB depending on model)
+- The model is cached in your browser's storage (IndexedDB)
+- Model files are public and contain no personal data
+- After download, the extension works completely offline
 
-- Screenshots are captured temporarily in memory
-- Screenshots are sent only to your local backend (127.0.0.1)
-- Screenshots are never uploaded to external servers
-- Screenshots are not permanently stored by the extension
+### Legacy Backend Mode (Optional)
+
+If you choose to enable "Backend Mode" in settings, the extension can use a Python backend running on your local machine (127.0.0.1):
+
+1. Screenshots are sent **only** to your local backend server (127.0.0.1:8000)
+2. The local Ollama AI model processes the image
+3. The explanation is returned to your browser
+
+**Even in backend mode, no data leaves your local machine or network.**
 
 ## Permissions Explained
 
@@ -56,78 +65,83 @@ The extension requires specific browser permissions to function. Here's why each
 - **Data Access**: Does not access tab content beyond what's needed for screenshots
 
 ### storage Permission
-- **Purpose**: Stores your backend URL preference locally in your browser
-- **Usage**: Saves your preferred backend server URL (default: http://127.0.0.1:8000)
-- **Data Stored**: Only the backend URL setting, stored locally in your browser
+- **Purpose**: Stores settings and cached AI models locally in your browser
+- **Usage**: 
+  - Saves your inference mode preference (browser vs backend)
+  - Saves backend URL if using legacy mode
+  - Caches downloaded AI models for offline use
+- **Data Stored**: 
+  - Settings: Inference mode and backend URL
+  - AI Models: Cached model files (80-500MB) in IndexedDB
+  - All data stored locally in your browser
 
 **Important**: These permissions allow the extension to access webpage content, but all processing happens locally and no data is transmitted externally.
 
-## Backend Server
-
-The CodeLearner extension requires a backend server to function, which you run on your own computer:
-
-- The backend runs locally at `127.0.0.1:8000` (your machine only)
-- The backend uses Ollama AI models installed on your machine
-- No cloud services or external APIs are involved
-- You have complete control over the backend and its data
-
 ## Third-Party Services
 
-CodeLearner does NOT use any third-party services:
+CodeLearner uses minimal third-party services:
 
+### Browser-Based Mode (Default)
+- **Hugging Face CDN**: Used only for initial model download
+  - One-time download on first use
+  - Models are public and contain no personal data
+  - After download, no further connection needed
+  - Models cached locally for offline use
+
+### No Other Services
 - No analytics tools (e.g., Google Analytics)
 - No crash reporting services
 - No advertising networks
-- No external APIs
+- No external APIs beyond initial model download
 - No cloud services
 
-The only "service" involved is Ollama, which runs entirely on your local machine.
+### Legacy Backend Mode
+- Uses Ollama running locally on your machine
+- No external services involved
+- All processing on localhost (127.0.0.1)
 
 ## Data Storage
 
-The extension stores only one piece of information locally:
+The extension stores data locally in your browser:
 
-- **Backend URL**: Your preferred backend server URL (stored using Chrome/Firefox storage API)
+### Browser-Based Mode
+- **AI Model Cache**: Cached model files (80-500MB) in IndexedDB
+- **Settings**: Inference mode preference (stored using Chrome/Firefox storage API)
+- **Backend URL**: If using legacy mode (stored using Chrome/Firefox storage API)
 
-This setting is stored locally in your browser and is never transmitted to external servers.
+### Data Lifecycle
+- Model cache persists until you clear browser data
+- Settings persist until you uninstall the extension or clear sync data
+- No data is stored on external servers
+- All data can be cleared through browser settings
 
 ## Security
 
 CodeLearner implements several security measures:
 
-- **Content Security Policy (CSP)**: Prevents unauthorized script execution
+- **Content Security Policy (CSP)**: Prevents unauthorized script execution, allows WebAssembly for AI models
 - **XSS Protection**: All content is sanitized before display
-- **Local-Only Processing**: No external network requests except to your local backend
+- **Local-Only Processing**: No external network requests except initial model download
 - **Minimal Permissions**: Only requests necessary browser permissions
-
-## Children's Privacy
-
-CodeLearner does not knowingly collect any information from anyone, including children under the age of 13.
-
-## Changes to This Privacy Policy
-
-We may update this privacy policy from time to time to reflect changes in the extension or legal requirements. When we make changes:
-
-- The "Last Updated" date at the top will be revised
-- Significant changes will be announced in the GitHub repository
-- Users will be notified through extension updates when appropriate
-
-We encourage you to review this privacy policy periodically.
-
-## Contact Us
-
-If you have questions or concerns about this privacy policy or the CodeLearner extension, please:
-
-- Open an issue on our [GitHub repository](https://github.com/tpC529/codelearner)
-- Review our documentation at [https://github.com/tpC529/codelearner](https://github.com/tpC529/codelearner)
+- **Web Workers**: AI processing runs in isolated worker threads
+- **Sandboxed Execution**: Models run in browser's WebAssembly/WebGPU sandbox
 
 ## Your Rights
 
 Since we do not collect any personal data, there is no personal information to access, modify, or delete. You maintain complete control over:
 
 - The extension installation (you can uninstall at any time)
-- Your local backend server and its data
-- Any local storage used by the extension (can be cleared through browser settings)
+- Your local AI model cache (can be cleared through browser settings)
+- Your settings (can be reset through extension options)
+- All local storage used by the extension (can be cleared through browser settings)
+
+### Clearing Extension Data
+
+To clear all data stored by the extension:
+
+1. **Chrome/Edge/Brave**: Settings → Privacy → Clear browsing data → Check "Hosted app data" and "IndexedDB"
+2. **Firefox**: Settings → Privacy → Clear Data → Check "Offline Website Data"
+3. **Safari**: Safari → Preferences → Privacy → Manage Website Data
 
 ## Compliance
 
@@ -136,10 +150,21 @@ This privacy policy is designed to comply with:
 - Chrome Web Store Developer Program Policies
 - Firefox Add-ons Policies
 - Microsoft Edge Add-ons Policies
+- Apple App Store Review Guidelines
 - General Data Protection Regulation (GDPR) principles
 - California Consumer Privacy Act (CCPA) principles
 
-Since CodeLearner does not collect any user data, it inherently complies with most privacy regulations.
+Since CodeLearner processes data entirely locally in your browser and does not collect any user data, it inherently complies with most privacy regulations.
+
+## Privacy Improvements in Version 2.0
+
+Version 2.0 introduces browser-based AI inference, which significantly enhances privacy:
+
+- ✅ **No local server required**: Eliminates need for Python backend (optional)
+- ✅ **Complete browser isolation**: All processing in browser sandbox
+- ✅ **Offline capable**: Works without network after model download
+- ✅ **Faster**: No localhost network requests
+- ✅ **More secure**: Reduced attack surface (no local server)
 
 ## Open Source
 
