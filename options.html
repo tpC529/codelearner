@@ -98,6 +98,18 @@
     • Only use if you prefer the old setup
   </div>
   
+  <label for="quickMode">
+    <input type="checkbox" id="quickMode"> Enable Quick Mode (Text Extraction)
+  </label>
+  
+  <div class="info">
+    <strong>Quick Mode:</strong><br>
+    • Automatically detects code blocks and extracts text directly<br>
+    • Much faster than image processing<br>
+    • Uses lightweight text LLM for explanations<br>
+    • Fallback to image mode for non-code content
+  </div>
+  
   <div id="backendSettings" class="backend-settings">
     <label for="backendUrl">Backend URL:</label>
     <input type="text" id="backendUrl" placeholder="http://127.0.0.1:8000">

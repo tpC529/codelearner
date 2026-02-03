@@ -3,9 +3,10 @@ const browserAPI = (typeof browser !== 'undefined') ? browser : chrome;
 
 // Load saved settings
 document.addEventListener('DOMContentLoaded', () => {
-  browserAPI.storage.sync.get(['backendUrl', 'inferenceMode'], (result) => {
+  browserAPI.storage.sync.get(['backendUrl', 'inferenceMode', 'quickMode'], (result) => {
     document.getElementById('backendUrl').value = result.backendUrl || 'http://127.0.0.1:8000';
     document.getElementById('inferenceMode').value = result.inferenceMode || 'browser';
+    document.getElementById('quickMode').checked = result.quickMode || false;
     
     // Show/hide backend settings based on mode
     toggleBackendSettings(result.inferenceMode || 'browser');
@@ -31,6 +32,7 @@ document.getElementById('inferenceMode').addEventListener('change', (e) => {
 document.getElementById('save').addEventListener('click', () => {
   const backendUrl = document.getElementById('backendUrl').value.trim();
   const inferenceMode = document.getElementById('inferenceMode').value;
+  const quickMode = document.getElementById('quickMode').checked;
   
   // Validate backend URL if backend mode is selected
   if (inferenceMode === 'backend') {
@@ -59,7 +61,8 @@ document.getElementById('save').addEventListener('click', () => {
   
   browserAPI.storage.sync.set({ 
     backendUrl: cleanUrl,
-    inferenceMode: inferenceMode
+    inferenceMode: inferenceMode,
+    quickMode: quickMode
   }, () => {
     const status = document.getElementById('status');
     status.textContent = 'Settings saved! Reload pages for changes to take effect.';

@@ -13,6 +13,11 @@ let modelWorker = null;
 let modelReady = false;
 let modelInitializing = false;
 
+// Text worker state for code extraction
+let textWorker = null;
+let textReady = false;
+let textInitializing = false;
+
 /**
  * Initialize model worker
  */
@@ -68,8 +73,63 @@ function initializeModelWorker() {
   }
 }
 
-// Initialize worker on content script load
+/**
+ * Initialize text worker
+ */
+function initializeTextWorker() {
+  if (textWorker || textInitializing) {
+    return;
+  }
+  
+  textInitializing = true;
+  console.log('[CodeLearner] Initializing text worker...');
+  
+  try {
+    textWorker = new Worker(browserAPI.runtime.getURL('text-worker.js'), { type: 'module' });
+    
+    textWorker.addEventListener('message', (event) => {
+      const { type, status, message, error } = event.data;
+      
+      switch (type) {
+        case 'ready':
+          console.log('[CodeLearner] Text worker ready');
+          break;
+          
+        case 'initialized':
+          textReady = true;
+          textInitializing = false;
+          console.log('[CodeLearner] Text model initialized:', status);
+          break;
+          
+        case 'progress':
+          console.log('[CodeLearner] Text progress:', message);
+          if (status === 'ready') {
+            textReady = true;
+            textInitializing = false;
+          }
+          break;
+          
+        case 'error':
+          console.error('[CodeLearner] Text worker error:', error);
+          textInitializing = false;
+          break;
+      }
+    });
+    
+    textWorker.addEventListener('error', (error) => {
+      console.error('[CodeLearner] Text worker error:', error);
+      textInitializing = false;
+    });
+    
+  } catch (error) {
+    console.error('[CodeLearner] Failed to create text worker:', error);
+    textInitializing = false;
+  }
+}
+
+// Initialize workers on content script load
 initializeModelWorker();
+initializeTextWorker();
 
 document.addEventListener("mousedown", e => {
   if (e.shiftKey) {
@@ -111,7 +171,25 @@ document.addEventListener("mouseup", async () => {
     return;
   }
 
-  // Request screenshot from background script
+  // Check for quick mode setting
+  let useQuickMode = false;
+  try {
+    const { quickMode } = await browserAPI.storage.sync.get(['quickMode']);
+    useQuickMode = quickMode || false;
+  } catch (storageErr) {
+    console.error("[CodeLearner] Storage access error:", storageErr);
+  }
+
+  // Try text extraction first if quick mode or if code elements detected
+  const extractedText = extractTextFromSelection(coords);
+  if (extractedText && (useQuickMode || isCodeContent(extractedText))) {
+    console.log("[CodeLearner] Using text-based extraction");
+    await processWithText(extractedText);
+    questionCount++;
+    return;
+  }
+
+  // Fallback to image mode
   try {
     const response = await browserAPI.runtime.sendMessage({action: "capture"});
     console.log("[CodeLearner] Response:", response);
@@ -273,57 +351,148 @@ async function processWithBackend(screenshot, coords) {
 }
 
 /**
- * Wait for model to be ready
+ * Wait for text model to be ready
  */
-function waitForModelReady() {
+function waitForTextReady() {
   return new Promise((resolve, reject) => {
     const checkReady = () => {
-      if (modelReady) {
+      if (textReady) {
         resolve();
-      } else if (!modelInitializing && !modelReady) {
-        reject(new Error('Model initialization failed'));
+      } else if (!textInitializing && !textReady) {
+        reject(new Error('Text model initialization failed'));
       } else {
         setTimeout(checkReady, 500);
       }
     };
     checkReady();
     
-    // Timeout after 5 minutes (for slow downloads)
-    setTimeout(() => reject(new Error('Model initialization timeout')), 300000);
+    // Timeout after 2 minutes
+    setTimeout(() => reject(new Error('Text model initialization timeout')), 120000);
   });
 }
 
 /**
- * Crop image to coordinates in main thread (Canvas API not available in workers)
+ * Extract text from selected area by finding overlapping elements
+ * @param {number[]} coords - [x1, y1, x2, y2]
+ * @returns {string|null} Extracted text or null
  */
-async function cropImageInMainThread(imageData, coords) {
-  return new Promise((resolve, reject) => {
-    try {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        const [x1, y1, x2, y2] = coords;
-        const width = x2 - x1;
-        const height = y2 - y1;
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        // Draw cropped region
-        ctx.drawImage(img, x1, y1, width, height, 0, 0, width, height);
-        
-        // Convert to data URL
-        const croppedData = canvas.toDataURL('image/png');
-        resolve(croppedData);
-      };
-      img.onerror = reject;
-      img.src = imageData;
-    } catch (error) {
-      reject(error);
+function extractTextFromSelection(coords) {
+  const [x1, y1, x2, y2] = coords;
+  const selectionRect = { left: x1, top: y1, right: x2, bottom: y2 };
+  
+  // Find all text-containing elements that overlap with selection
+  const elements = document.querySelectorAll('code, pre, .hljs, .syntax-highlight, [class*="highlight"], [class*="code"]');
+  let extractedText = '';
+  
+  for (const element of elements) {
+    const rect = element.getBoundingClientRect();
+    const elementRect = {
+      left: rect.left + window.scrollX,
+      top: rect.top + window.scrollY,
+      right: rect.right + window.scrollX,
+      bottom: rect.bottom + window.scrollY
+    };
+    
+    // Check if element overlaps with selection
+    if (!(elementRect.left > selectionRect.right || 
+          elementRect.right < selectionRect.left || 
+          elementRect.top > selectionRect.bottom || 
+          elementRect.bottom < selectionRect.top)) {
+      
+      // Extract text content
+      const text = element.textContent || element.innerText || '';
+      if (text.trim()) {
+        extractedText += text.trim() + '\n';
+      }
     }
-  });
+  }
+  
+  return extractedText.trim() || null;
+}
+
+/**
+ * Check if extracted text appears to be code
+ * @param {string} text - The extracted text
+ * @returns {boolean} True if likely code
+ */
+function isCodeContent(text) {
+  if (!text || text.length < 10) return false;
+  
+  // Check for code patterns
+  const codePatterns = [
+    /\b(function|const|let|var|def|class|import|export|if|else|for|while)\b/,
+    /[{}();]/,
+    /\b(int|string|void|public|private)\b/,
+    /[<>\[\]]/,
+    /\b(SELECT|FROM|WHERE|INSERT|UPDATE)\b/i,
+    /#include|<[^>]+>/,
+  ];
+  
+  const matches = codePatterns.reduce((count, pattern) => {
+    return count + (pattern.test(text) ? 1 : 0);
+  }, 0);
+  
+  return matches >= 2; // At least 2 code patterns suggest it's code
+}
+
+/**
+ * Process extracted text using text worker
+ * @param {string} codeText - The extracted code text
+ */
+async function processWithText(codeText) {
+  try {
+    console.log('[CodeLearner] Processing with text extraction...');
+    
+    // Initialize text worker if not ready
+    if (!textReady && !textInitializing) {
+      showLoadingPanel('Initializing text model...');
+      initializeTextWorker();
+      
+      textWorker.postMessage({ type: 'initialize' });
+      
+      await waitForTextReady();
+    }
+    
+    showLoadingPanel('Analyzing code...');
+    
+    // Send text to worker for processing
+    return new Promise((resolve, reject) => {
+      const messageHandler = (event) => {
+        const { type, explanation, language, error } = event.data;
+        
+        if (type === 'result') {
+          textWorker.removeEventListener('message', messageHandler);
+          showTextPanel(codeText, explanation, language);
+          resolve();
+        } else if (type === 'error') {
+          textWorker.removeEventListener('message', messageHandler);
+          hideLoadingPanel();
+          
+          console.error('[CodeLearner] Text processing failed:', error);
+          alert('Text processing failed: ' + error);
+          reject(new Error(error));
+        }
+      };
+      
+      textWorker.addEventListener('message', messageHandler);
+      textWorker.postMessage({
+        type: 'explain',
+        data: { codeText: codeText }
+      });
+      
+      // Timeout after 30 seconds
+      setTimeout(() => {
+        textWorker.removeEventListener('message', messageHandler);
+        hideLoadingPanel();
+        reject(new Error('Text processing timeout'));
+      }, 30000);
+    });
+    
+  } catch (error) {
+    console.error('[CodeLearner] Text processing error:', error);
+    hideLoadingPanel();
+    throw error;
+  }
 }
 
 /**
@@ -387,7 +556,7 @@ function hideLoadingPanel() {
   }
 }
 
-function showFloatingPanel(imgSrc, text) {
+function showTextPanel(codeText, explanation, language) {
   // Hide loading panel
   hideLoadingPanel();
   
@@ -399,26 +568,29 @@ function showFloatingPanel(imgSrc, text) {
     document.body.appendChild(panel);
   }
   
-  // Validate imgSrc is a safe data URI (base64 encoded PNG)
-  if (!imgSrc || !imgSrc.startsWith('data:image/png;base64,')) {
-    console.error("[CodeLearner] Invalid image source");
-    return;
-  }
-  
-  // Create elements safely without innerHTML for better security
   panel.innerHTML = '';
   
-  const img = document.createElement('img');
-  img.src = imgSrc;
-  img.style.cssText = 'max-width:100%; border-radius:8px; margin-bottom:12px;';
+  // Show detected language
+  if (language && language !== 'unknown') {
+    const langBadge = document.createElement('div');
+    langBadge.style.cssText = 'background:#e3f2fd; color:#1976d2; padding:4px 8px; border-radius:4px; font-size:12px; display:inline-block; margin-bottom:8px;';
+    langBadge.textContent = language.toUpperCase();
+    panel.appendChild(langBadge);
+  }
+  
+  // Show code snippet
+  const codeDiv = document.createElement('div');
+  codeDiv.style.cssText = 'background:#f5f5f5; padding:12px; border-radius:8px; margin-bottom:12px; font-family:monospace; font-size:13px; white-space:pre-wrap; max-height:150px; overflow:auto; border-left:4px solid #FF006E;';
+  codeDiv.textContent = codeText.length > 500 ? codeText.substring(0, 500) + '...' : codeText;
+  panel.appendChild(codeDiv);
   
   const p = document.createElement('p');
   const strong = document.createElement('strong');
   strong.textContent = 'Explanation: ';
   p.appendChild(strong);
   
-  // Split text by newlines and add them as separate text nodes with br elements
-  const lines = text.split('\n');
+  // Split explanation by newlines and add them as separate text nodes with br elements
+  const lines = explanation.split('\n');
   lines.forEach((line, index) => {
     const textNode = document.createTextNode(line);
     p.appendChild(textNode);
@@ -436,7 +608,6 @@ function showFloatingPanel(imgSrc, text) {
     questionCount = 0;
   });
   
-  panel.appendChild(img);
   panel.appendChild(p);
   panel.appendChild(button);
 }

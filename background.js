@@ -3,6 +3,27 @@ const browserAPI = (typeof browser !== 'undefined') ? browser : chrome;
 
 console.log("[CodeLearner Background] Service worker started");
 
+// Preload workers on install to cache models
+browserAPI.runtime.onInstalled.addListener(async (details) => {
+  if (details.reason === 'install') {
+    console.log("[CodeLearner Background] Extension installed, preloading models...");
+    
+    try {
+      // Preload model worker
+      const modelWorker = new Worker(browserAPI.runtime.getURL('model-worker.js'), { type: 'module' });
+      modelWorker.postMessage({ type: 'initialize' });
+      
+      // Preload text worker
+      const textWorker = new Worker(browserAPI.runtime.getURL('text-worker.js'), { type: 'module' });
+      textWorker.postMessage({ type: 'initialize' });
+      
+      console.log("[CodeLearner Background] Model preloading initiated");
+    } catch (error) {
+      console.error("[CodeLearner Background] Error preloading models:", error);
+    }
+  }
+});
+
 browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   console.log("[CodeLearner Background] Message received:", msg);
   

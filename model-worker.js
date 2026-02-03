@@ -14,17 +14,17 @@ let modelLoaded = false;
 
 // Model configuration
 const MODEL_CONFIG = {
-  // Primary model - ViT-GPT2 for image captioning (well-supported in Transformers.js)
+  // Primary model - Smaller BLIP model for faster inference
   primary: {
-    name: 'Xenova/vit-gpt2-image-captioning',
+    name: 'Xenova/blip-image-captioning-base',
     task: 'image-to-text',
     options: {
       device: 'auto', // WebGPU > WebGL > WASM
     }
   },
-  // Fallback model - smaller BLIP model
+  // Fallback model - Even smaller if available
   fallback: {
-    name: 'Xenova/blip-image-captioning-base',
+    name: 'Xenova/vit-gpt2-image-captioning',
     task: 'image-to-text',
     options: {
       device: 'auto',
@@ -138,12 +138,13 @@ async function processImage(imageData, coords = null) {
     }
     
     // Generate explanation
-    const prompt = 'Describe what code or text you see in this image. What programming language is it? What does it do?';
+    const prompt = 'Analyze this image and describe any code, programming syntax, or technical content you see. Identify the programming language, explain what the code does, and highlight key concepts.';
     
     const result = await modelPipeline(processedImage, {
       prompt: prompt,
-      max_new_tokens: 100,
-      temperature: 0.3,
+      max_new_tokens: 150,
+      temperature: 0.2,
+      do_sample: true,
     });
     
     console.log('[Model Worker] Processing complete');

@@ -9,7 +9,7 @@
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
   "web_accessible_resources": [{
-    "resources": ["model-worker.js"],
+    "resources": ["model-worker.js", "text-worker.js"],
     "matches": ["<all_urls>"]
   }],
   "background": {
