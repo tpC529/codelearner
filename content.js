@@ -18,6 +18,36 @@ let modelInitializing = false;
 let textWorker = null;
 let textReady = false;
 let textInitializing = false;
+let textModeDisabled = false; // Flag to track if text mode is disabled
+
+/**
+ * Detect browser type
+ * @returns {string} 'chrome', 'edge', or 'other'
+ */
+function detectBrowser() {
+  const userAgent = navigator.userAgent;
+  if (userAgent.indexOf("Edg") > -1) {
+    return 'edge';
+  } else if (userAgent.indexOf("Chrome") > -1) {
+    return 'chrome';
+  }
+  return 'other';
+}
+
+/**
+ * Show user notification message
+ * @param {string} message - The message to show
+ * @param {boolean} isError - Whether this is an error message
+ */
+function showUserMessage(message, isError = false) {
+  // Use a simple alert for now, could be enhanced with a custom UI later
+  if (isError) {
+    console.error('[CodeLearner]', message);
+    alert('CodeLearner: ' + message);
+  } else {
+    console.log('[CodeLearner]', message);
+  }
+}
 
 /**
  * Initialize model worker
@@ -78,7 +108,7 @@ function initializeModelWorker() {
  * Initialize text worker
  */
 function initializeTextWorker() {
-  if (textWorker || textInitializing) {
+  if (textWorker || textInitializing || textModeDisabled) {
     return;
   }
   
@@ -125,6 +155,22 @@ function initializeTextWorker() {
   } catch (error) {
     console.error('[CodeLearner] Failed to create text worker:', error);
     textInitializing = false;
+    
+    // Handle SecurityError specifically for Edge on HTTPS pages
+    if (error.name === 'SecurityError' || error.message.includes('SecurityError')) {
+      const browser = detectBrowser();
+      textModeDisabled = true;
+      
+      if (browser === 'edge') {
+        showUserMessage('Text mode is not supported in Microsoft Edge on HTTPS pages due to browser security restrictions. CodeLearner will use image-only mode for code explanations.', false);
+      } else {
+        showUserMessage('Text mode initialization failed due to security restrictions. CodeLearner will use image-only mode for code explanations.', false);
+      }
+    } else {
+      // For other errors, show as error but still disable text mode
+      textModeDisabled = true;
+      showUserMessage('Text mode initialization failed: ' + error.message + '. CodeLearner will use image-only mode.', true);
+    }
   }
 }
 
@@ -178,66 +224,68 @@ document.addEventListener("mouseup", async () => {
     return;
   }
 
-  // Check for quick mode setting
-  let useQuickMode = false;
-  try {
-    const { quickMode } = await browserAPI.storage.sync.get(['quickMode']);
-    useQuickMode = quickMode || false;
-  } catch (storageErr) {
-    console.error("[CodeLearner] Storage access error:", storageErr);
-  }
-
-  // Try text extraction first if quick mode or if code elements detected
-  const extractedText = extractTextFromSelection(coords);
-  if (extractedText && (useQuickMode || isCodeContent(extractedText))) {
-    console.log("[CodeLearner] Using text-based extraction");
-    await processWithText(extractedText);
-    questionCount++;
+  // Check question limit before processing
+  if (questionCount >= 3) {
+    alert("Limit reached (3 questions). Reload page to reset.");
     return;
   }
 
-  // Fallback to image mode
-  try {
-    const response = await browserAPI.runtime.sendMessage({action: "capture"});
-    console.log("[CodeLearner] Response:", response);
-    
-    if (!response || typeof response === 'object' && response.error) {
-      console.error("[CodeLearner] Screenshot capture failed:", response?.error);
-      alert("Screenshot capture failed: " + (response?.error || "No response"));
-      return;
-    }
-    
-    const screenshot = response;
-
-    if (questionCount >= 3) {
-      alert("Limit reached (3 questions). Reload page to reset.");
-      return;
-    }
-
-    console.log("[CodeLearner] Screenshot captured, processing...");
-    
-    // Check if we should use backend or browser-based inference
-    let useBackend = false;
+  // Try text extraction first if quick mode or if code elements detected, and text mode is not disabled
+  const extractedText = extractTextFromSelection(coords);
+  let processedSuccessfully = false;
+  
+  if (extractedText && !textModeDisabled && (useQuickMode || isCodeContent(extractedText))) {
+    console.log("[CodeLearner] Using text-based extraction");
     try {
-      const { inferenceMode } = await browserAPI.storage.sync.get(['inferenceMode']);
-      useBackend = inferenceMode === 'backend';
-    } catch (storageErr) {
-      console.error("[CodeLearner] Storage access error:", storageErr);
+      await processWithText(extractedText);
+      processedSuccessfully = true;
+    } catch (textError) {
+      console.error('[CodeLearner] Text processing failed, falling back to image mode:', textError);
+      // Continue to image mode below
     }
-    
-    if (useBackend) {
-      // Use legacy backend mode
-      await processWithBackend(screenshot, coords);
-    } else {
-      // Use browser-based inference (default)
-      await processWithBrowser(screenshot, coords);
-    }
-
-    questionCount++;
-  } catch (error) {
-    console.error("[CodeLearner] Error:", error);
-    alert("Error: " + error.message);
   }
+
+  // Use image mode if text mode was not used or failed
+  if (!processedSuccessfully) {
+    // Fallback to image mode
+    try {
+      const response = await browserAPI.runtime.sendMessage({action: "capture"});
+      console.log("[CodeLearner] Response:", response);
+      
+      if (!response || typeof response === 'object' && response.error) {
+        console.error("[CodeLearner] Screenshot capture failed:", response?.error);
+        alert("Screenshot capture failed: " + (response?.error || "No response"));
+        return;
+      }
+      
+      const screenshot = response;
+
+      console.log("[CodeLearner] Screenshot captured, processing...");
+      
+      // Check if we should use backend or browser-based inference
+      let useBackend = false;
+      try {
+        const { inferenceMode } = await browserAPI.storage.sync.get(['inferenceMode']);
+        useBackend = inferenceMode === 'backend';
+      } catch (storageErr) {
+        console.error("[CodeLearner] Storage access error:", storageErr);
+      }
+      
+      if (useBackend) {
+        // Use legacy backend mode
+        await processWithBackend(screenshot, coords);
+      } else {
+        // Use browser-based inference (default)
+        await processWithBrowser(screenshot, coords);
+      }
+    } catch (error) {
+      console.error("[CodeLearner] Error:", error);
+      alert("Error: " + error.message);
+      return;
+    }
+  }
+
+  questionCount++;
 });
 
 /**
@@ -365,6 +413,8 @@ function waitForTextReady() {
     const checkReady = () => {
       if (textReady) {
         resolve();
+      } else if (textModeDisabled) {
+        reject(new Error('Text mode is disabled'));
       } else if (!textInitializing && !textReady) {
         reject(new Error('Text model initialization failed'));
       } else {
@@ -476,7 +526,6 @@ async function processWithText(codeText) {
           hideLoadingPanel();
           
           console.error('[CodeLearner] Text processing failed:', error);
-          alert('Text processing failed: ' + error);
           reject(new Error(error));
         }
       };
