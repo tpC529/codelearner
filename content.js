@@ -4,8 +4,9 @@ const browserAPI = (typeof browser !== 'undefined') ? browser : chrome;
 let selecting = false;
 let startX, startY;
 let questionCount = 0;
+let selectionMode = 'shift-drag'; // Default
 const overlay = document.createElement("div");
-overlay.style.cssText = "position:absolute; border:3px solid #FF006E; background:rgba(255,0,110,0.15); pointer-events:none; z-index:9999999; display:none;";
+overlay.style.cssText = "position:absolute; border:3px solid #007BFF; background:rgba(0,123,255,0.15); pointer-events:none; z-index:9999999; display:none;";
 document.body.appendChild(overlay);
 
 // Model worker state
@@ -131,8 +132,14 @@ function initializeTextWorker() {
 initializeModelWorker();
 initializeTextWorker();
 
+// Load selection mode from storage
+browserAPI.storage.sync.get(['selectionMode'], (result) => {
+  selectionMode = result.selectionMode || 'shift-drag';
+});
+
 document.addEventListener("mousedown", e => {
-  if (e.shiftKey) {
+  const shouldSelect = (selectionMode === 'shift-drag' && e.shiftKey) || (selectionMode === 'click-drag' && !e.shiftKey);
+  if (shouldSelect) {
     selecting = true;
     startX = e.pageX;
     startY = e.pageY;

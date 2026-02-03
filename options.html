@@ -110,7 +110,17 @@
     • Fallback to image mode for non-code content
   </div>
   
-  <div id="backendSettings" class="backend-settings">
+  <label for="selectionMode">Selection Mode:</label>
+  <select id="selectionMode">
+    <option value="shift-drag">Shift + Drag</option>
+    <option value="click-drag">Click + Drag</option>
+  </select>
+  
+  <div class="info">
+    <strong>Selection Mode:</strong><br>
+    • <strong>Shift + Drag:</strong> Hold Shift and drag to select area<br>
+    • <strong>Click + Drag:</strong> Click and drag to select area (without Shift)
+  </div>
     <label for="backendUrl">Backend URL:</label>
     <input type="text" id="backendUrl" placeholder="http://127.0.0.1:8000">
     
